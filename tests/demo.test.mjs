@@ -54,3 +54,15 @@ test('standalone demo renders 62 slots and saves repeat predictions without cont
   await form.handlers.submit(event);
   assert.match(receipt.children[2].textContent,/DEMO-0002/);
 });
+
+
+test('invitation fragments preserve Base64 plus signs and decode escaped characters', () => {
+  const source = readFileSync(new URL('../public/pool.mjs',import.meta.url),'utf8');
+  const parser = source.slice(source.indexOf('function invitationToken('),source.indexOf('async function api('));
+  const parse = runInNewContext(parser + '; invitationToken');
+  assert.equal(parse('#invite=abc+def/ghi=='),'abc+def/ghi==');
+  assert.equal(parse('#invite=abc%2Bdef%2Fghi%3D%3D'),'abc+def/ghi==');
+  assert.equal(parse('#invite=a%26b%23c%25d'),'a&b#c%d');
+  assert.equal(parse('#other=value'),null);
+  assert.throws(() => parse('#invite=%broken'),/not encoded correctly/);
+});

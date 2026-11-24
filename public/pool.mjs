@@ -9,6 +9,13 @@ let giftEnabled = false;
 const banner = '';
 const hero = '<section class="hero"><div class="hero-copy"><p class="hero-eyebrow">A little star is on his way</p><h1>Mahuvagara Baby Arrival Pool</h1><p class="hero-subtitle">Guess when our newest family member will arrive.</p><p class="hero-instructions">Pick a January date and choose AM or PM.</p><span class="badge"><span aria-hidden="true">✦</span> Expected January 21, 2027</span></div><div class="hero-art" aria-hidden="true"><svg viewBox="0 0 360 360" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="moon-glow" x1="100" y1="30" x2="260" y2="220" gradientUnits="userSpaceOnUse"><stop stop-color="#fff0bd"/><stop offset="1" stop-color="#e5bd75"/></linearGradient><linearGradient id="blanket" x1="120" y1="230" x2="240" y2="310" gradientUnits="userSpaceOnUse"><stop stop-color="#80baff"/><stop offset="1" stop-color="#376caf"/></linearGradient></defs><circle cx="180" cy="167" r="142" stroke="#294a70" stroke-dasharray="3 9"/><circle cx="180" cy="167" r="116" fill="#132b49" fill-opacity=".55"/><path d="M210 48a83 83 0 1 0 62 131A74 74 0 0 1 210 48Z" fill="url(#moon-glow)"/><path d="M180 194v31M128 192v45M232 192v45" stroke="#7e9bbc" stroke-width="2"/><path d="M116 192q64-27 128 0" stroke="#a8c7eb" stroke-width="3" stroke-linecap="round"/><path d="m128 230 4 9 10 1-8 7 2 10-8-5-9 5 2-10-8-7 10-1Z" fill="#efd193"/><path d="m232 230 4 9 10 1-8 7 2 10-8-5-9 5 2-10-8-7 10-1Z" fill="#efd193"/><circle cx="180" cy="246" r="21" fill="#f1d3b9"/><path d="M158 246a22 22 0 0 1 44 0q-23-12-44 0" fill="#a8d1ff"/><path d="M168 249q4 4 8 0m8 0q4 4 8 0" stroke="#725846" stroke-width="2" stroke-linecap="round"/><path d="M147 267q33-19 66 0l-8 28h-50Z" fill="url(#blanket)"/><path d="m164 266 33 27m-42-13 23 16" stroke="#b7d9ff" stroke-width="2" opacity=".6"/><path d="M129 283h102q-6 31-51 31t-51-31Z" fill="#213f63" stroke="#7b9fc8" stroke-width="2"/><path d="M147 311l-8 12m74-12 8 12m-87 3q46 15 92 0" stroke="#7b9fc8" stroke-width="3" stroke-linecap="round"/><path d="M59 269c-13-22-43-10-40 10-19 2-19 28 3 28h66c25 0 27-30 5-33-6-19-29-19-34-5Zm236-65c-12-19-36-8-34 9-17 2-17 23 2 23h55c22 0 23-25 4-28-5-16-24-16-27-4Z" fill="#244468"/><g fill="#b9d8ff"><path d="m78 83 3 10 10 3-10 3-3 10-3-10-10-3 10-3Zm208 38 3 10 10 3-10 3-3 10-3-10-10-3 10-3Zm-34-96 3 8 8 3-8 3-3 8-3-8-8-3 8-3Z"/><circle cx="103" cy="38" r="2"/><circle cx="310" cy="174" r="3"/><circle cx="57" cy="184" r="2"/><circle cx="280" cy="284" r="2"/></g></svg><span class="art-caption">One tiny arrival. So much love.</span></div></section>';
 
+function invitationToken(hash) {
+  const match = hash.match(/(?:^#|&)invite=([^&]*)/);
+  if (!match) return null;
+  try { return decodeURIComponent(match[1]); }
+  catch { throw new Error('This invitation link is not encoded correctly. Ask the organizer for a new link.'); }
+}
+
 async function api(action, body) {
   const response = await fetch('/api/pool/' + action, body === undefined ? {} : {
     method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body),
@@ -137,7 +144,7 @@ function render() {
 async function start() {
   try {
     if (!demo) {
-      const token = new URLSearchParams(location.hash.slice(1)).get('invite');
+      const token = invitationToken(location.hash);
       if (token) {
         await api('invite',{token});
         history.replaceState(null,'',location.pathname + location.search);
@@ -154,4 +161,7 @@ async function start() {
     root.removeAttribute('aria-busy');
   }
 }
+globalThis.addEventListener?.('hashchange', () => {
+  if (!demo) location.reload();
+});
 start();
