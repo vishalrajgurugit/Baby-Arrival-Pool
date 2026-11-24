@@ -20,7 +20,7 @@ async function api(action, body) {
 
 function calendar() {
   const cells = days.map(day => '<div class="weekday">' + day + '</div>');
-  for (let i=0; i<5; i++) cells.push('<div aria-hidden="true"></div>');
+  for (let i=0; i<5; i++) cells.push('<div class="calendar-spacer" aria-hidden="true"></div>');
   for (let day=1; day<=31; day++) {
     const due = day === 21;
     const buttons = ['AM','PM'].map(period =>
@@ -28,6 +28,7 @@ function calendar() {
       '" data-period="' + period + '" aria-label="January ' + day + ' ' + period +
       '" aria-pressed="false"' + (closed ? ' disabled' : '') + '>' + period + '</button>').join('');
     cells.push('<div class="day' + (due?' due':'') + '"><div class="day-number">' + day +
+      '<span class="day-weekday">' + days[(day + 4) % 7] + '</span>' +
       (due?'<span class="due-symbol" aria-label="Expected due date">✦</span>':'') +
       '</div><div class="slots">' + buttons + '</div></div>');
   }
