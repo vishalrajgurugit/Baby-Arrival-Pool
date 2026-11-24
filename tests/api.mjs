@@ -19,7 +19,7 @@ const database=createServer(async (req,res)=>{
   if(req.url==='/rest/v1/rpc/delete_prediction') {
     deletes++; const {p_reference}=JSON.parse(raw); res.end(JSON.stringify(rows.delete(p_reference))); return;
   }
-  if(req.url==='/rest/v1/rpc/record_prediction') {res.end(JSON.stringify([{reference:other,gift_requested:false}]));return;}
+  if(req.url==='/rest/v1/rpc/record_prediction_bundle') {const input=JSON.parse(raw);assert.equal(input.p_second_day,22);assert.equal(input.p_second_period,'AM');assert.equal(input.p_gift,false);res.end(JSON.stringify([{reference:other,gift_requested:false}]));return;}
   res.statusCode=404;res.end('{}');
 });
 await new Promise(resolve=>database.listen(0,'127.0.0.1',resolve));
@@ -51,7 +51,7 @@ try {
   assert.equal((await post('delete',{reference:first},'first-session')).status,404);
   assert.equal((await post('delete',{reference:second},'second-session')).status,200);
   const response=await fetch(base+'/api/pool/submit',{method:'POST',headers:{origin:base,'content-type':'application/json',cookie:'pool_invite='+invite},
-    body:JSON.stringify({requestId:other,name:'Test',email:'test@example.com',day:21,period:'PM',wishes:''})});
+    body:JSON.stringify({requestId:other,name:'Test',email:'test@example.com',day:21,period:'PM',secondDay:22,secondPeriod:'AM',wishes:''})});
   assert.equal(response.status,200);
   const receipt=await response.json();
   assert.equal(receipt.reference,other);assert.equal(receipt.emailStatus,'unavailable');assert.equal(receipt.transferEmail,null);

@@ -61,7 +61,7 @@ function dashboard(data) {
     '<p id="totals"></p><p id="collection" class="muted"></p><h2>Birth result</h2><form id="birth"><label class="field">Actual birth date and time (Toronto)' +
     '<input type="datetime-local" name="birth" required></label><button class="action">Save birth result</button></form>' +
     '<p class="muted">Saving the birth result closes entries. You can correct the date or time after saving.</p>' +
-    '<p class="error" role="alert"></p><h2>Predictions</h2><div class="admin-table"><table><thead><tr><th>Reference</th><th>Participant</th><th>Slot</th>' +
+    '<p class="error" role="alert"></p><h2>Predictions</h2><div class="admin-table"><table><thead><tr><th>Reference</th><th>Participant</th><th>Predictions</th>' +
     '<th>Wishes</th><th>Gift</th><th>Result</th><th>Actions</th></tr></thead><tbody></tbody></table></div><div class="admin-actions" id="pages"></div>';
   action('Sign out',root.querySelector('#actions'),async () => { await api('logout',{}); login(); });
   const total = new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}).format(data.totals.collected_cents / 100);
@@ -91,7 +91,8 @@ function dashboard(data) {
     item('td',entry.reference,row);
     const participant = item('td',entry.name,row);
     item('div',entry.email,participant);
-    item('td','Jan ' + entry.day + ' ' + entry.period,row);
+    const slots = 'Jan ' + entry.day + ' ' + entry.period + (entry.second_day ? ' and Jan ' + entry.second_day + ' ' + entry.second_period : ' (original single entry)');
+    item('td',slots,row);
     item('td',entry.wishes,row);
     const gift = item('td',entry.received_at ? 'Received · $5 CAD' : entry.gift_requested ? 'Awaiting $5 CAD' : 'No gift requested',row);
     if (entry.gift_requested && !entry.received_at && data.collection) {
@@ -100,16 +101,16 @@ function dashboard(data) {
         await load();
       });
     }
-    item('td',data.birth ? entry.correct ? 'Correct' : '—' : 'Pending',row);
+    item('td',data.birth ? entry.correct ? 'Matching prediction' : '—' : 'Pending',row);
     const controls = item('td','',row);
     const remove = action('Delete', controls, async () => {
-      if (!confirm('Permanently delete the prediction by ' + entry.name + ' for January ' + entry.day + ' ' + entry.period + '?\nReference: ' + entry.reference + '\nThis cannot be undone. Other predictions will be kept.')) return;
+      if (!confirm('Permanently delete ' + (entry.second_day ? 'both predictions' : 'the prediction') + ' by ' + entry.name + ' for ' + slots + '?\nReference: ' + entry.reference + '\nThis cannot be undone. Other predictions will be kept.')) return;
       await api('delete',{reference:entry.reference});
       after = 0;
       pages.length = 0;
       await load();
     });
-    remove.setAttribute('aria-label','Delete prediction by ' + entry.name + ' for January ' + entry.day + ' ' + entry.period);
+    remove.setAttribute('aria-label','Delete ' + (entry.second_day ? 'both predictions' : 'prediction') + ' by ' + entry.name + ' for ' + slots);
   }
   const pageControls = root.querySelector('#pages');
   if (pages.length) action('Previous page',pageControls,async () => {

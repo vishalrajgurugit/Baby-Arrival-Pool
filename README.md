@@ -104,3 +104,6 @@ Verification: `node --test tests/*.test.mjs`, `pnpm run build`, then
 checks in `supabase/tests/email_delete.sql` require a dedicated test database and
 roll back their synthetic records. These SQL checks must be run separately from
 local JavaScript checks.
+
+### Two-prediction bundles
+Apply `supabase/migrations/202611240004_prediction_bundles.sql` before deploying this version. Each new submission requires two January AM/PM choices (duplicates allowed), stored atomically with one reference and at most one $5 CAD gift. CSV and organizer rows show both choices; confirming or deleting acts on the entire bundle. Totals count individual predictions but count the $5 gift only once. Historical single entries and payment states are preserved. Gifts and email sending remain disabled until separately enabled.

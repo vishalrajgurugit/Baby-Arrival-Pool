@@ -40,7 +40,7 @@ export async function GET(request: NextRequest, context: Context) {
         async pull(controller) {
           if (!started) {
             started = true;
-            controller.enqueue(encoder.encode('\uFEFFReference,Name,Email,Wishes,Date,Period,Expected CAD,Received CAD,Received at UTC,Submitted at UTC,Correct\r\n'));
+            controller.enqueue(encoder.encode('\uFEFFReference,Name,Email,Wishes,Date,Period,Second date,Second period,Expected CAD,Received CAD,Received at UTC,Submitted at UTC,Correct\r\n'));
             return;
           }
           if (cursor >= end) return controller.close();
@@ -49,7 +49,8 @@ export async function GET(request: NextRequest, context: Context) {
           cursor = batch[batch.length - 1].id;
           controller.enqueue(encoder.encode(batch.map(entry => [
             entry.reference, entry.name, entry.email, entry.wishes,
-            '2027-01-' + String(entry.day).padStart(2,'0'), entry.period, entry.gift_requested ? '5.00':'0.00',
+            '2027-01-' + String(entry.day).padStart(2,'0'), entry.period,
+            entry.second_day ? '2027-01-' + String(entry.second_day).padStart(2,'0') : '', entry.second_period, entry.gift_requested ? '5.00':'0.00',
             entry.received_at ? '5.00':'0.00', entry.received_at, entry.created_at, correct(entry,birth) ? 'Yes':'No',
           ].map(csvCell).join(',')).join('\r\n') + '\r\n'));
         },
@@ -100,8 +101,9 @@ export async function POST(request: NextRequest, context: Context) {
       const gift = collection();
       const transferEmail = gift ? process.env.INTERAC_TRANSFER_EMAIL : undefined;
       if (gift && !transferEmail) return failed();
-      const [receipt] = await rpc<{reference:string;gift_requested:boolean}[]>('record_prediction', {
+      const [receipt] = await rpc<{reference:string;gift_requested:boolean}[]>('record_prediction_bundle', {
         p_request_id:entry.requestId,p_day:entry.day,p_period:entry.period,p_name:entry.name,
+        p_second_day:entry.secondDay,p_second_period:entry.secondPeriod,
         p_email:entry.email,p_wishes:entry.wishes,p_gift:gift,
       });
       if (!receipt) return error('The pool is closed or this submission already changed. Refresh the page.',409);

@@ -22,7 +22,7 @@ test('standalone demo renders 62 slots and saves repeat predictions without cont
   root.dataset.mode = 'demo';
   const form = node();
   const name = {value:'',focus(){}};
-  form.elements = {name,email:{value:''},wishes:{value:''}};
+  form.elements = {name,email:{value:''},wishes:{value:''},secondDay:{value:''},secondPeriod:{value:''}};
   form.querySelectorAll = () => Object.values(form.elements);
   const receipt = node();
   const calendar = node();
@@ -47,7 +47,7 @@ test('standalone demo renders 62 slots and saves repeat predictions without cont
   const event = {preventDefault(){}};
   await form.handlers.submit(event);
   assert.equal(receipt.hidden,false);
-  assert.match(receipt.children[1].textContent,/January 21 · PM/);
+  assert.match(receipt.children[1].textContent,/January 21 · PM and January 22 · AM/);
   assert.match(receipt.children[2].textContent,/DEMO-0001/);
   assert.equal(receipt.children.some(child => child.tag === 'a'),false);
   receipt.children.at(-1).handlers.click();

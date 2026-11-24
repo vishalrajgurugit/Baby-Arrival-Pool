@@ -3,14 +3,14 @@ import assert from 'node:assert/strict';
 import {birthTime,csvCell,prediction,TIME_ZONE} from '../lib/rules.ts';
 import {correct,collection} from '../lib/server.ts';
 
-const example = {day:21,period:'AM',name:' Alex ',email:'alex@example.com',wishes:'hello',requestId:'00000000-0000-4000-8000-000000000001'};
+const example = {day:21,period:'AM',secondDay:22,secondPeriod:'PM',name:' Alex ',email:'alex@example.com',wishes:'hello',requestId:'00000000-0000-4000-8000-000000000001'};
 test('accepts January AM/PM predictions and independent requests for the same slot', () => {
   assert.equal(prediction(example).name,'Alex');
   assert.equal(prediction({...example,requestId:'00000000-0000-4000-8000-000000000002'}).day,21);
   assert.equal(prediction({...example,day:31,period:'PM',wishes:undefined}).wishes,'');
 });
 test('rejects out-of-range, invalid, and oversized inputs', () => {
-  for (const overrides of [{day:0},{day:32},{day:21.5},{day:'21'},{period:'noon'},{name:' '},{email:'a@b'},{wishes:'a'.repeat(1001)},{requestId:''}])
+  for (const overrides of [{secondDay:undefined},{secondPeriod:undefined},{secondDay:32},{secondDay:1.5},{secondPeriod:'noon'},{day:0},{day:32},{day:21.5},{day:'21'},{period:'noon'},{name:' '},{email:'a@b'},{wishes:'a'.repeat(1001)},{requestId:''}])
     assert.throws(() => prediction({...example,...overrides}));
 });
 test('compares Toronto wall time and puts noon in PM', () => {
@@ -47,4 +47,10 @@ test('gift collection requires both live mode and explicit activation', () => {
       else process.env[key] = previous[key];
     }
   }
+});
+
+test('bundle allows duplicate slots and either stored choice can match; historic single entries still work', () => {
+  assert.equal(prediction({...example,secondDay:21,secondPeriod:'AM'}).secondDay,21);
+  assert.equal(correct({...example,second_day:22,second_period:'PM'},'2027-01-22T12:00:00'),true);
+  assert.equal(correct(example,'2027-01-22T12:00:00'),false);
 });

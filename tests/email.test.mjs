@@ -44,3 +44,11 @@ for(const mode of ['success','rejected','timeout','bookkeeping-failed','claim-fa
     assert.equal(sent,mode==='claim-failed'?0:1);
   });
 }
+
+test('bundle confirmation includes both choices and only one gift instruction', () => {
+ const entry={reference:'bundle-ref',name:'Test',email:'test@example.invalid',day:21,period:'AM',secondDay:22,secondPeriod:'PM',giftRequested:true};
+ const text=confirmationText(entry,true,'recipient@example.invalid');
+ assert.match(text,/January 21, 2027/);assert.match(text,/January 22, 2027/);
+ assert.match(text,/single \$5 gift covers both predictions/);
+ assert.match(confirmationText({...entry,giftRequested:false},false),/No payment is due for these predictions/);
+});

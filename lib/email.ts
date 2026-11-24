@@ -1,22 +1,23 @@
 import {collection, live, rpc, db} from './server.ts';
 
-type Confirmation = {reference:string; name:string; email:string; day:number; period:string; giftRequested:boolean};
+type Confirmation = {reference:string; name:string; email:string; day:number; period:string; secondDay?:number; secondPeriod?:string; giftRequested:boolean};
 export type EmailStatus = 'disabled'|'submitted'|'already_requested'|'unavailable';
 
 export function confirmationText(entry: Confirmation, giftsOpen: boolean, recipient?: string) {
   const lines = [
     `Hello ${entry.name},`, '',
-    'Your prediction for Mahuvagara Baby Arrival Pool is saved.',
+    entry.secondDay ? 'Your two predictions for Mahuvagara Baby Arrival Pool are saved.' : 'Your prediction for Mahuvagara Baby Arrival Pool is saved.',
     `Prediction: January ${entry.day}, 2027 · ${entry.period} (Toronto time)`,
+    ...(entry.secondDay ? [`Second prediction: January ${entry.secondDay}, 2027 · ${entry.secondPeriod} (Toronto time)`] : []),
     `Confirmation reference: ${entry.reference}`, '',
   ];
   if (entry.giftRequested && giftsOpen && recipient) {
     lines.push(`Send $5 CAD by Interac e-Transfer to ${recipient}.`,
-      'Include your confirmation reference in the transfer message.',
+      entry.secondDay ? 'This single $5 gift covers both predictions. Include your confirmation reference in the transfer message.' : 'Include your confirmation reference in the transfer message.',
       'The organizer will confirm receipt manually. This email is not a payment receipt.',
       'All gifts go to the baby. There are no monetary prizes.');
   } else if (!entry.giftRequested) {
-    lines.push('No payment is due for this prediction.');
+    lines.push(entry.secondDay ? 'No payment is due for these predictions.' : 'No payment is due for this prediction.');
   } else {
     lines.push('Gift instructions are currently unavailable. Please check with the organizer.');
   }

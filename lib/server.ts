@@ -62,17 +62,17 @@ export async function isAdmin(request: NextRequest) {
 
 export type Entry = {
   id: number; reference: string; day: number; period: 'AM'|'PM'; name: string;
-  email: string; wishes: string; gift_requested: boolean; received_at: string|null; created_at: string;
+  second_day?: number|null; second_period?: 'AM'|'PM'|null; email: string; wishes: string; gift_requested: boolean; received_at: string|null; created_at: string;
 };
 
 export const entries = (after: number, limit: number) => db<Entry[]>(
-  'predictions?select=id,reference,day,period,name,email,wishes,gift_requested,received_at,created_at' +
+  'predictions?select=id,reference,day,period,second_day,second_period,name,email,wishes,gift_requested,received_at,created_at' +
   '&order=id.asc&id=gt.' + after + '&limit=' + limit,
 );
 export const settings = async () =>
   (await db<{birth_local:string|null}[]>('pool_settings?id=eq.1&select=birth_local'))[0];
 
 export function correct(entry: Entry, birth: string|null) {
-  return !!birth && birth.slice(0,7) === '2027-01' && Number(birth.slice(8,10)) === entry.day &&
-    (Number(birth.slice(11,13)) < 12 ? 'AM' : 'PM') === entry.period;
+  return !!birth && birth.slice(0,7) === '2027-01' && [[entry.day,entry.period],[entry.second_day,entry.second_period]].some(([day,period]) =>
+      Number(birth.slice(8,10)) === day && (Number(birth.slice(11,13)) < 12 ? 'AM' : 'PM') === period);
 }

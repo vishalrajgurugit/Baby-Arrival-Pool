@@ -53,3 +53,6 @@
 .hero .hero-subtitle {font-family:Georgia,"Times New Roman",serif;font-size:clamp(1.2rem,2.2vw,1.45rem);font-style:italic;line-height:1.55;color:#d7e7fa;margin:20px 0 8px;text-wrap:pretty}
 .hero .hero-instructions {font-size:.95rem;line-height:1.6;color:#b2c5df;margin:0 0 20px}
 @media(max-width:600px) {.shell {padding-top:12px}}
+
+.field select { width:100%; min-height:44px; padding:12px; border:1px solid #45658a; border-radius:10px; background:#0b1c32; color:#edf5ff; font:inherit; font-size:16px; }
+.field select:focus-visible { outline:2px solid #80baff; outline-offset:2px; }
