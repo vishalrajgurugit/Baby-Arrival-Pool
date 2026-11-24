@@ -31,3 +31,20 @@
 @media (hover:hover) {
   .slot:not(:disabled):hover,.action:not(:disabled):hover {filter:brightness(1.15)}
 }
+
+/* A quiet night-sky welcome, with illustration kept clear of the copy. */
+.hero {display:grid;grid-template-columns:minmax(0,1.65fr) minmax(230px,1fr);align-items:center;gap:24px;background:radial-gradient(ellipse at 92% 15%,#163555 0,transparent 60%),linear-gradient(135deg,#0c192e,#081424);border-color:#2b496c}
+.hero-copy {min-width:0}
+.hero h1 {font-size:clamp(2.25rem,4.7vw,3.8rem);letter-spacing:-.045em;line-height:1.1}
+.hero .year {font-size:.68em;margin-top:12px;color:#91c2ff;letter-spacing:.02em}
+.hero .hero-eyebrow {color:#b6d6ff;text-transform:uppercase;letter-spacing:.16em;font-size:.7rem;font-weight:750;margin:0 0 18px}
+.hero .badge {gap:8px;align-items:center;background:#12273e;border-color:#406181;color:#d8e9ff}
+.hero-art {width:100%;max-width:340px;justify-self:center;text-align:center}
+.hero-art svg {display:block;width:100%;height:auto}
+.art-caption {display:block;color:#b2c5df;font-size:.75rem;letter-spacing:.06em;margin-top:6px}
+@media(max-width:700px) {
+  .hero {grid-template-columns:minmax(0,1fr);gap:14px;padding:24px}
+  .hero h1 {font-size:clamp(2.05rem,8vw,3rem)}
+  .hero-art {max-width:230px}
+  .hero .hero-eyebrow {font-size:.65rem;letter-spacing:.12em}
+}
