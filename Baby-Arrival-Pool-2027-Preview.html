@@ -1,0 +1,158 @@
+<!doctype html><html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Baby Arrival Pool 2027 · Demo</title><style>*{box-sizing:border-box}body{margin:0;background:#fff9f4;color:#29243b;font:16px/1.5 system-ui,sans-serif}h1,h2{font-family:Georgia,serif;font-weight:normal;line-height:1.08;margin:0 0 .6rem}h1{font-size:clamp(2.75rem,7vw,5rem);letter-spacing:-.06em}h2{font-size:2rem;letter-spacing:-.035em}p{margin:.4rem 0 1rem}a{color:#593b8f}button,input,textarea{font:inherit}button{cursor:pointer}button:disabled{cursor:default;opacity:.55}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #8861c2;outline-offset:3px}.shell{width:min(1150px,100%);margin:auto;padding:0 24px 48px}.top{min-height:66px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:.87rem;font-weight:700}.brand{display:flex;align-items:center;gap:.6rem}.brand-mark{display:grid;place-items:center;background:#ece2ff;color:#5d418e;border-radius:50%;width:34px;height:34px;font-size:1.1rem}.badge{display:inline-flex;border:1px solid #dfd2ed;background:#fff8fa;border-radius:99px;padding:6px 12px;color:#604781;font-size:.75rem;font-weight:750;white-space:nowrap}.hero{position:relative;overflow:hidden;background:radial-gradient(ellipse at 88% 16%,#ffe7c7 0,transparent 47%),linear-gradient(120deg,#eee3ff,#fce6ed);border:1px solid #efdeed;border-radius:28px;padding:clamp(24px,5vw,55px);margin-bottom:24px}.hero-copy{position:relative;z-index:1}.hero p{color:#584b67;max-width:35rem}.year{display:block;color:#7151a0}.cloud{position:absolute;right:9%;top:13%;font-size:clamp(48px,14vw,160px);line-height:1;color:#fffcf5;transform:rotate(-13deg);text-shadow:0 14px 36px #b198bd35;user-select:none}.spark{position:absolute;color:#9a70b2;right:10%;bottom:18%;font-size:2.5rem}.workspace{display:grid;grid-template-columns:minmax(0,2.15fr) minmax(245px,1fr);gap:20px;align-items:start}.card{background:#fff;border:1px solid #eadfef;border-radius:22px;padding:22px;box-shadow:0 6px 24px #5c397008}.muted{color:#665a73;font-size:.9rem}.calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}.weekday{text-align:center;color:#655873;font-size:.75rem;font-weight:700;padding-bottom:6px}.day{min-width:0;border:1px solid #eee7f1;border-radius:12px;padding:5px;background:#fffcff}.day.due{background:#fff0dc;border-color:#ebc18b}.day-number{font-size:.86rem;font-weight:800;display:flex;justify-content:space-between;padding:0 2px 4px}.due-symbol{color:#875324}.slots{display:flex;gap:3px}.slot{border:0;border-radius:6px;background:#eee7f9;color:#533e71;flex:1;min-width:0;min-height:34px;padding:0;font-size:.69rem;font-weight:800}.slot.pm{background:#fae7ee;color:#773e55}.slot[aria-pressed=true]{background:#60418e;color:white}.legend{margin:.8rem 0 0;color:#665a73;font-size:.8rem}.selection{display:block;background:#f3ebff;color:#563d7d;padding:10px 12px;border-radius:10px;margin-bottom:12px;font-weight:700;font-size:.9rem}.field{display:block;margin:10px 0;font-weight:700;font-size:.86rem}.field input,.field textarea{display:block;width:100%;border:1px solid #ded3e5;border-radius:9px;padding:9px;margin-top:4px;background:#fff;color:#29243b;font-weight:400}.action{border:0;border-radius:10px;background:#62428e;color:white;padding:10px 15px;font-weight:750}.action.secondary{background:#eee7f9;color:#563a80}.wide{width:100%}.error{color:#9b2547}.receipt{overflow-wrap:anywhere}.admin-table{overflow:auto;margin:16px 0}table{border-collapse:collapse;width:100%;font-size:.87rem}th,td{text-align:left;vertical-align:top;padding:8px;border-bottom:1px solid #eee3f0;overflow-wrap:anywhere}th{white-space:nowrap}#admin{max-width:1050px;margin:auto;padding:20px}#admin h1{font-size:clamp(2rem,6vw,3.5rem)}.admin-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}@media(max-width:850px){.workspace{grid-template-columns:1fr}.slots{flex-direction:column}.slot{min-height:42px}.cloud{right:5%;top:12%}}@media(max-width:480px){.shell{padding:0 9px 24px}.card{padding:12px}.calendar{gap:3px}.day{padding:3px}.hero{border-radius:20px}.cloud{right:5%;top:12%;opacity:.55}}
+</style></head><body><main id="pool" data-mode="demo" aria-busy="true"></main><script type="module">const root = document.querySelector('#pool');
+const demo = root.dataset.mode === 'demo';
+const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+let selected;
+let requestId;
+let sampleNumber = 0;
+let closed = false;
+let giftEnabled = false;
+const banner = '<header class="top"><div class="brand"><span class="brand-mark" aria-hidden="true">✦</span> Baby Arrival Pool</div><span class="badge">' + (demo ? 'Demo preview' : 'Private family pool') + '</span></header>';
+const hero = '<section class="hero"><div class="hero-copy"><h1>Baby Arrival Pool <span class="year">2027</span></h1><p>Guess when our newest family member will arrive. Pick a January date and choose AM or PM.</p><span class="badge">Expected January 21, 2027</span></div><span class="cloud" aria-hidden="true">☁</span><span class="spark" aria-hidden="true">✧</span></section>';
+
+async function api(action, body) {
+  const response = await fetch('/api/pool/' + action, body === undefined ? {} : {
+    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Please try again.');
+  return data;
+}
+
+function calendar() {
+  const cells = days.map(day => '<div class="weekday">' + day + '</div>');
+  for (let i=0; i<5; i++) cells.push('<div aria-hidden="true"></div>');
+  for (let day=1; day<=31; day++) {
+    const due = day === 21;
+    const buttons = ['AM','PM'].map(period =>
+      '<button class="slot ' + period.toLowerCase() + '" type="button" data-day="' + day +
+      '" data-period="' + period + '" aria-label="January ' + day + ' ' + period +
+      '" aria-pressed="false"' + (closed ? ' disabled' : '') + '>' + period + '</button>').join('');
+    cells.push('<div class="day' + (due?' due':'') + '"><div class="day-number">' + day +
+      (due?'<span class="due-symbol" aria-label="Expected due date">✦</span>':'') +
+      '</div><div class="slots">' + buttons + '</div></div>');
+  }
+  return cells.join('');
+}
+
+function render() {
+  root.innerHTML = '<div class="shell">' + banner + hero +
+    '<div class="workspace"><section class="card" aria-labelledby="month"><h2 id="month">January 2027</h2>' +
+    '<p class="muted">Toronto time · AM before noon · PM from noon</p><div class="calendar">' +
+    calendar() + '</div><p class="legend">✦ Expected due date. Any number of people can pick the same slot.</p></section>' +
+    '<section class="card"><h2>Make a prediction</h2><p class="muted">$5 CAD per prediction when gift collection is open. All gifts go to the baby. There are no monetary prizes.</p>' +
+    '<p class="muted" id="gift-status"></p><form id="prediction"><span class="selection" id="selection" role="status">Choose a date and time</span>' +
+    '<label class="field">Your name<input name="name" maxlength="100" placeholder="Alex Taylor" autocomplete="name" required></label>' +
+    '<label class="field">Email address<input name="email" type="email" maxlength="254" placeholder="alex@example.com" autocomplete="email" required></label>' +
+    '<label class="field">Wishes for the baby <span class="muted">(optional)</span><textarea name="wishes" rows="3" maxlength="1000" placeholder="A little note for the family"></textarea></label>' +
+    '<button class="action wide" id="submit" disabled>Save prediction</button><p class="error" role="alert" id="form-error"></p></form>' +
+    '<div id="receipt" class="receipt" tabindex="-1" role="status" hidden></div></section></div></div>';
+  const form = root.querySelector('form');
+  const submit = root.querySelector('#submit');
+  const error = root.querySelector('#form-error');
+  const receipt = root.querySelector('#receipt');
+  root.querySelector('#gift-status').textContent = closed ? 'Predictions are closed.' :
+    giftEnabled ? 'Interac e-Transfer instructions appear after you save your prediction.' :
+    demo ? 'Try a sample entry. Gift collection is off in the demo.' : 'Gift collection is currently off. You can still save a prediction.';
+  form.hidden = closed;
+  if (demo) {
+    const sample = document.createElement('button');
+    sample.type = 'button';
+    sample.className = 'action secondary';
+    sample.textContent = 'Use sample details';
+    sample.addEventListener('click', () => {
+      form.elements.name.value = 'Alex Taylor';
+      form.elements.email.value = 'alex@example.com';
+      form.elements.wishes.value = 'Wishing you a lifetime of love and laughter!';
+    });
+    form.insertBefore(sample,form.firstChild);
+  }
+  root.querySelector('.calendar').addEventListener('click', event => {
+    const button = event.target.closest('.slot');
+    if (!button || button.disabled || submit.dataset.busy) return;
+    root.querySelector('[aria-pressed="true"]')?.setAttribute('aria-pressed','false');
+    button.setAttribute('aria-pressed','true');
+    selected = {day:Number(button.dataset.day),period:button.dataset.period};
+    requestId = undefined;
+    root.querySelector('#selection').textContent = 'January ' + selected.day + ' · ' + selected.period;
+    receipt.hidden = true;
+    error.textContent = '';
+    submit.disabled = false;
+  });
+  form.addEventListener('input', () => { requestId = undefined; });
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (!selected || submit.dataset.busy) return;
+    submit.dataset.busy = 'true';
+    submit.disabled = true;
+    const fields = [...form.querySelectorAll('input,textarea')];
+    const data = Object.fromEntries(new FormData(form));
+    fields.forEach(field => { field.readOnly = true; });
+    error.textContent = '';
+    try {
+      if (!data.name.trim()) throw new Error('Enter your name.');
+      const result = demo
+        ? {reference:'DEMO-' + String(++sampleNumber).padStart(4,'0') + '-' + Math.random().toString(36).slice(2,8).toUpperCase()}
+        : await api('submit', {...selected,...data,requestId:requestId ??= crypto.randomUUID()});
+      const heading = document.createElement('h2');
+      heading.textContent = demo ? 'Sample prediction saved' : 'Prediction saved';
+      const slot = document.createElement('p');
+      slot.textContent = 'January ' + selected.day + ' · ' + selected.period + ' (Toronto time)';
+      const ref = document.createElement('p');
+      ref.textContent = 'Confirmation reference: ' + result.reference;
+      receipt.replaceChildren(heading,slot,ref);
+      if (result.transferEmail) {
+        const instructions = document.createElement('p');
+        instructions.append('Send $5 CAD by Interac e-Transfer to ');
+        const email = document.createElement('a');
+        email.href = 'mailto:' + result.transferEmail;
+        email.textContent = result.transferEmail;
+        instructions.append(email, '. Include your confirmation reference in the transfer message. The organizer will confirm receipt manually.');
+        receipt.append(instructions);
+      }
+      const again = document.createElement('button');
+      again.className = 'action secondary';
+      again.textContent = 'Make another prediction';
+      again.addEventListener('click', () => {
+        receipt.hidden = true;
+        form.hidden = false;
+        form.elements.name.focus();
+      });
+      receipt.append(again);
+      requestId = undefined;
+      form.elements.wishes.value = '';
+      form.hidden = true;
+      receipt.hidden = false;
+      receipt.focus();
+    } catch (cause) {
+      error.textContent = cause.message || 'Please try again.';
+    } finally {
+      fields.forEach(field => { field.readOnly = false; });
+      delete submit.dataset.busy;
+      submit.disabled = false;
+    }
+  });
+}
+
+async function start() {
+  try {
+    if (!demo) {
+      const token = new URLSearchParams(location.hash.slice(1)).get('invite');
+      if (token) {
+        await api('invite',{token});
+        history.replaceState(null,'',location.pathname + location.search);
+      }
+      const status = await api('status');
+      closed = status.closed;
+      giftEnabled = status.collection;
+    }
+    render();
+  } catch (cause) {
+    root.innerHTML = '<div class="shell">' + banner + hero + '<section class="card"><h2>Private invitation required</h2><p id="access-error"></p></section></div>';
+    root.querySelector('#access-error').textContent = cause.message;
+  } finally {
+    root.removeAttribute('aria-busy');
+  }
+}
+start();
+</script></body></html>
