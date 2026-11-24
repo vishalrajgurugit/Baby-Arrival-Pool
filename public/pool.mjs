@@ -108,6 +108,14 @@ function render() {
       const ref = document.createElement('p');
       ref.textContent = 'Confirmation reference: ' + result.reference;
       receipt.replaceChildren(heading,slot,ref);
+      if (result.emailStatus === 'submitted' || result.emailStatus === 'unavailable') {
+        const emailNote = document.createElement('p');
+        emailNote.className = 'muted';
+        emailNote.textContent = result.emailStatus === 'submitted'
+          ? 'Your confirmation email has been submitted for delivery. Keep this reference too.'
+          : 'Your prediction is saved, but we could not confirm an email was sent. Keep this reference and the instructions shown here.';
+        receipt.append(emailNote);
+      }
       if (result.transferEmail) {
         const instructions = document.createElement('p');
         instructions.append('Send $5 CAD by Interac e-Transfer to ');

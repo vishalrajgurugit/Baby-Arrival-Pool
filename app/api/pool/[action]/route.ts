@@ -1,3 +1,4 @@
+import {sendPredictionEmail} from '../../../../lib/email';
 import {NextRequest, NextResponse} from 'next/server';
 import {birthTime, csvCell, prediction} from '../../../../lib/rules';
 import {collection, correct, db, entries, inviteMatches, isAdmin, live, rpc, settings, signIn} from '../../../../lib/server';
@@ -104,7 +105,8 @@ export async function POST(request: NextRequest, context: Context) {
         p_email:entry.email,p_wishes:entry.wishes,p_gift:gift,
       });
       if (!receipt) return error('The pool is closed or this submission already changed. Refresh the page.',409);
-      return json({reference:receipt.reference, transferEmail:receipt.gift_requested ? transferEmail ?? null : null});
+      const emailStatus = await sendPredictionEmail({...entry, reference:receipt.reference, giftRequested:receipt.gift_requested});
+      return json({reference:receipt.reference, transferEmail:receipt.gift_requested ? transferEmail ?? null : null, emailStatus});
     }
     if (action === 'login') {
       if (typeof body.email !== 'string' || typeof body.password !== 'string') return error('Enter your email and password.',400);
@@ -120,6 +122,11 @@ export async function POST(request: NextRequest, context: Context) {
       return response;
     }
     if (!(await isAdmin(request))) return error('Organizer sign-in required.',401);
+    if (action === 'delete') {
+      if (typeof body.reference !== 'string' || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(body.reference)) return error('Invalid reference.',400);
+      if (!(await rpc<boolean>('delete_prediction',{p_reference:body.reference}))) return error('Prediction not found.',404);
+      return json({ok:true});
+    }
     if (action === 'confirm') {
       if (!collection()) return error('Gift collection is disabled.',409);
       if (typeof body.reference !== 'string' || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(body.reference)) return error('Invalid reference.',400);

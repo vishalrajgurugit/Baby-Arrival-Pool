@@ -62,7 +62,7 @@ function dashboard(data) {
     '<input type="datetime-local" name="birth" required></label><button class="action">Save birth result</button></form>' +
     '<p class="muted">Saving the birth result closes entries. You can correct the date or time after saving.</p>' +
     '<p class="error" role="alert"></p><h2>Predictions</h2><div class="admin-table"><table><thead><tr><th>Reference</th><th>Participant</th><th>Slot</th>' +
-    '<th>Wishes</th><th>Gift</th><th>Result</th></tr></thead><tbody></tbody></table></div><div class="admin-actions" id="pages"></div>';
+    '<th>Wishes</th><th>Gift</th><th>Result</th><th>Actions</th></tr></thead><tbody></tbody></table></div><div class="admin-actions" id="pages"></div>';
   action('Sign out',root.querySelector('#actions'),async () => { await api('logout',{}); login(); });
   const total = new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}).format(data.totals.collected_cents / 100);
   root.querySelector('#totals').textContent = total + ' CAD collected · ' + data.totals.received + ' confirmed gifts · ' + data.totals.entries + ' predictions';
@@ -84,7 +84,7 @@ function dashboard(data) {
   const tbody = root.querySelector('tbody');
   if (!data.entries.length) {
     const empty = item('td','No predictions yet.',item('tr','',tbody));
-    empty.colSpan = 6;
+    empty.colSpan = 7;
   }
   for (const entry of data.entries) {
     const row = item('tr','',tbody);
@@ -101,6 +101,15 @@ function dashboard(data) {
       });
     }
     item('td',data.birth ? entry.correct ? 'Correct' : '—' : 'Pending',row);
+    const controls = item('td','',row);
+    const remove = action('Delete', controls, async () => {
+      if (!confirm('Permanently delete the prediction by ' + entry.name + ' for January ' + entry.day + ' ' + entry.period + '?\nReference: ' + entry.reference + '\nThis cannot be undone. Other predictions will be kept.')) return;
+      await api('delete',{reference:entry.reference});
+      after = 0;
+      pages.length = 0;
+      await load();
+    });
+    remove.setAttribute('aria-label','Delete prediction by ' + entry.name + ' for January ' + entry.day + ' ' + entry.period);
   }
   const pageControls = root.querySelector('#pages');
   if (pages.length) action('Previous page',pageControls,async () => {

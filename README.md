@@ -54,3 +54,53 @@ Generate the invitation token on your own computer with `node -e "console.log(re
 - Keep the export private. It contains participant names, emails and wishes.
 
 See the [Vercel GitHub deployment guide](https://vercel.com/docs/git/vercel-for-github), [Next.js environment variable guide](https://nextjs.org/docs/app/guides/environment-variables), and [Supabase API key guide](https://supabase.com/docs/guides/api/api-keys).
+
+
+## Confirmation emails and deleting predictions
+
+Apply all numbered SQL migrations in order. Existing projects need both
+`supabase/migrations/202611240002_confirmation_email.sql` and
+`supabase/migrations/202611240003_delete_prediction.sql` before using the new features.
+The existing GitHub Pages demo remains offline and never sends email.
+
+Email is off by default. For production, use a Resend Free account and a verified
+sending domain you already control. Set these Vercel **Production only** variables:
+
+| Variable | Value |
+| --- | --- |
+| `EMAIL_ENABLED` | `true` only after the migration and sender setup are complete |
+| `RESEND_API_KEY` | Server-side Resend sending API key; store as a secret |
+| `EMAIL_FROM` | Approved sender address on the verified domain |
+| `INTERAC_TRANSFER_EMAIL` | Organizer-confirmed e-transfer recipient; independent of sender |
+| `GIFT_COLLECTION_ENABLED` | Keep `false` until separately authorized to enable gifts |
+
+Redeploy after changing configuration. Resend requires domain verification for
+participant delivery: https://resend.com/docs/dashboard/domains/introduction .
+Use only the Free plan and its quotas; do not enable paid overages or upgrades.
+If no sending domain is available, leave email disabled pending a provider choice.
+Do not use a personal Gmail/Yahoo address as a Resend sender.
+
+Emails contain the selected date/time and confirmation reference. Free submissions
+explicitly say no payment is due. E-transfer instructions are included only when
+that saved prediction requested a gift, collection is currently enabled, and a
+recipient is configured. Sending never marks a gift as received.
+
+The database permanently claims one send attempt per prediction, and the provider
+also receives an idempotency key. Repeated/concurrent submissions cannot cause a
+second send. Provider acceptance is recorded as `submitted`, not delivery.
+Failures or timeouts never cancel a saved prediction. There is no automatic retry:
+inspect `prediction_email_delivery` and the provider log before any manual resend,
+especially for `unknown`/`claimed` attempts. Do not clear claims to retry blindly.
+No email is sent for existing predictions merely by enabling the feature.
+
+The organizer dashboard has a per-row Delete action. It confirms the participant,
+slot and reference, permanently deletes only that prediction and its email-attempt
+record, then reloads counts and the first page. Both allowlisted organizers can use
+it; ordinary authenticated users cannot. There is no bulk-delete endpoint. A
+previously sent email cannot be recalled by deleting its prediction.
+
+Verification: `node --test tests/*.test.mjs`, `pnpm run build`, then
+`node tests/api.mjs` (local fake Supabase; no real email). Database integration
+checks in `supabase/tests/email_delete.sql` require a dedicated test database and
+roll back their synthetic records. These SQL checks must be run separately from
+local JavaScript checks.
