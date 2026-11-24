@@ -6,8 +6,8 @@ let requestId;
 let sampleNumber = 0;
 let closed = false;
 let giftEnabled = false;
-const banner = '<header class="top"><div class="brand"><span class="brand-mark" aria-hidden="true">✦</span> Baby Arrival Pool</div><span class="badge">' + (demo ? 'Demo preview' : 'Private family pool') + '</span></header>';
-const hero = '<section class="hero"><div class="hero-copy"><h1>Baby Arrival Pool <span class="year">2027</span></h1><p>Guess when our newest family member will arrive. Pick a January date and choose AM or PM.</p><span class="badge">Expected January 21, 2027</span></div><span class="cloud" aria-hidden="true">☁</span><span class="spark" aria-hidden="true">✧</span></section>';
+const banner = '<header class="top"><div class="brand"><span class="brand-mark" aria-hidden="true">✦</span> Mahuvagara Baby Arrival Pool</div><span class="badge">' + (demo ? 'Demo preview' : 'Private family pool') + '</span></header>';
+const hero = '<section class="hero"><div class="hero-copy"><h1>Mahuvagara Baby Arrival Pool <span class="year">2027</span></h1><p>Guess when our newest family member will arrive. Pick a January date and choose AM or PM.</p><span class="badge">Expected January 21, 2027</span></div><span class="cloud" aria-hidden="true">☁</span><span class="spark" aria-hidden="true">✧</span></section>';
 
 async function api(action, body) {
   const response = await fetch('/api/pool/' + action, body === undefined ? {} : {
