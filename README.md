@@ -20,7 +20,7 @@ Open http://localhost:3000. The application defaults to demo mode. The SQL integ
 
 1. Create a Supabase project at [supabase.com](https://supabase.com/dashboard). Keep the database password private.
 2. Open **SQL Editor**, create a new query, paste the full contents of `supabase/migrations/202611240001_pool.sql`, then select **Run** once.
-3. Under **Authentication → Users**, create and confirm one organizer user. Use a unique, strong password and copy that user's UUID. Disable public sign-ups in the authentication settings. The organizer is authorized by UUID.
+3. Under **Authentication → Users**, create and confirm each authorized organizer user. Each person should choose a unique, strong password. Copy their UUIDs and disable public sign-ups. Only the UUIDs explicitly listed in ADMIN_USER_IDS receive organizer access.
 4. Copy the project URL, the publishable API key, and the server-only secret key. The legacy anon and service_role keys also work in the corresponding fields.
 
 ## Deploy on Vercel
@@ -35,7 +35,7 @@ Open http://localhost:3000. The application defaults to demo mode. The SQL integ
 | `SUPABASE_URL` | Your Supabase project URL |
 | `SUPABASE_PUBLISHABLE_KEY` | Supabase publishable key |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server-only Supabase secret or legacy service_role key |
-| `ADMIN_USER_ID` | Organizer's Supabase user UUID |
+| `ADMIN_USER_IDS` | Comma-separated Supabase UUIDs for the authorized organizers. Unlisted users are denied. |
 | `INVITE_TOKEN` | A private, randomly generated secret of at least 32 characters |
 | `INTERAC_TRANSFER_EMAIL` | Organizer email for Interac e-Transfer. Set it privately before enabling gifts. |
 | `GIFT_COLLECTION_ENABLED` | `false` until applicable requirements and provider policies are confirmed |

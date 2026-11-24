@@ -36,20 +36,28 @@ export async function db<T>(path: string, method = 'GET', body?: unknown): Promi
 
 export const rpc = <T>(method: string, body = {}) => db<T>('rpc/' + method, 'POST', body);
 
+export function allowedAdmin(id: unknown) {
+  const configured = process.env.ADMIN_USER_IDS ?? process.env.ADMIN_USER_ID ?? '';
+  const ids = configured.split(',').map(value => value.trim().toLowerCase()).filter(Boolean);
+  const uuid = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/;
+  return ids.length > 0 && ids.every(value => uuid.test(value)) &&
+    typeof id === 'string' && ids.includes(id.toLowerCase());
+}
+
 export async function signIn(email: string, password: string) {
   const response = await supabase('/auth/v1/token?grant_type=password', required('SUPABASE_PUBLISHABLE_KEY'), {
     method:'POST', body: JSON.stringify({email, password}),
   });
   if (!response.ok) return null;
   const session = await response.json();
-  return session.user?.id === required('ADMIN_USER_ID') ? session as {access_token: string; expires_in: number} : null;
+  return allowedAdmin(session.user?.id) ? session as {access_token: string; expires_in: number} : null;
 }
 
 export async function isAdmin(request: NextRequest) {
   const token = request.cookies.get('pool_admin')?.value;
   if (!token) return false;
   const response = await supabase('/auth/v1/user', required('SUPABASE_PUBLISHABLE_KEY'), {}, token);
-  return response.ok && (await response.json()).id === required('ADMIN_USER_ID');
+  return response.ok && allowedAdmin((await response.json()).id);
 }
 
 export type Entry = {
